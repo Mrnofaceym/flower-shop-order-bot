@@ -1,0 +1,15 @@
+# systemd user service: ~/.config/systemd/user/orders-bot.service
+[Unit]
+Description=Flower shop order bot (Google Sheets)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=%h/orders-bot
+Environment=TZ=Europe/Kyiv
+ExecStart=%h/orders-bot/.venv/bin/python bot.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
