@@ -4,9 +4,11 @@ Catalog lives in the sheet too: the owner edits prices/stock there and the bot p
 """
 import asyncio
 import html
+import json
 import logging
 import re
 from datetime import date
+from pathlib import Path
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
@@ -324,12 +326,55 @@ async def my_orders(m: Message):
     await m.answer("📦 <b>Ваші останні замовлення</b>\n" + "\n".join(rows))
 
 
+# ---------- status notifications ----------
+STATUS_FILE = Path(__file__).parent / "statuses.json"   # last known status of each order
+
+
+def status_message(number, status):
+    """Text the customer gets when the owner changes the order status in the sheet.
+    Returns None for statuses we don't announce."""
+    texts = {
+        "Підтверджено": "🔵 Замовлення №{n} підтверджено! Вже збираємо ваш букет 💐",
+        "Доставляється": "🚚 Замовлення №{n} вже в дорозі. Скоро будемо!",
+        "Виконано": "✅ Замовлення №{n} виконано. Дякуємо, що обрали нас! 🌷",
+        "Скасовано": "❌ Замовлення №{n} скасовано. Якщо це помилка — напишіть нам.",
+    }
+    text = texts.get(status)
+    return text.format(n=number) if text else None
+
+
+async def watch_statuses(bot: Bot):
+    """Every minute: compare statuses in the sheet with the saved ones and notify customers about changes."""
+    known = json.loads(STATUS_FILE.read_text()) if STATUS_FILE.exists() else None
+    while True:
+        try:
+            orders = await sheets.statuses()
+            current = {str(o["number"]): o["status"] for o in orders}
+            if known is not None:          # on the very first run just remember, don't spam old orders
+                for o in orders:
+                    num = str(o["number"])
+                    if known.get(num, "Нове") != o["status"]:
+                        text = status_message(o["number"], o["status"])
+                        if text:
+                            try:
+                                await bot.send_message(int(o["user"]), text)
+                            except Exception:
+                                logging.exception("notify %s", num)
+            if current != known:
+                STATUS_FILE.write_text(json.dumps(current, ensure_ascii=False))
+                known = current
+        except Exception as e:
+            logging.warning("status check failed: %s", e)
+        await asyncio.sleep(config.STATUS_CHECK_SECONDS)
+
+
 async def main():
     missing = [k for k in ("BOT_TOKEN", "SHEET_URL", "SHEET_SECRET") if not getattr(config, k)]
     if missing:
         raise SystemExit("Fill in .env: " + ", ".join(missing))
     bot = Bot(config.BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
     await bot.delete_webhook(drop_pending_updates=True)
+    asyncio.create_task(watch_statuses(bot))
     await dp.start_polling(bot)
 
 

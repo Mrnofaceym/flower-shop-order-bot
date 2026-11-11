@@ -1,15 +1,16 @@
 # Flower shop order bot → Google Sheets
 
-Telegram bot for a small shop (demo: flower shop «Півонія»). Customers order in Telegram, orders land in a **Google Sheet**, the owner changes the status in the sheet — and the customer sees it in the bot.
+Telegram bot for a small shop (demo: flower shop «Півонія»). Customers order in Telegram, orders land in a **Google Sheet**, the owner changes the status in the sheet — and the customer gets a message within a minute.
 
-Telegram-бот для невеликого магазину: замовлення в Telegram → Google Таблиця → власник змінює статус у таблиці → клієнт бачить його в боті.
+Telegram-бот для невеликого магазину: замовлення в Telegram → Google Таблиця → власник змінює статус у таблиці → клієнт за хвилину отримує повідомлення.
 
 ## Features
 - **Catalog from the sheet**: the owner edits products, prices and "in stock" right in Google Sheets — no admin panel needed.
 - Cart with quantities, checkout step by step: name, phone (contact button), pickup or delivery, address, date, comment, summary.
 - Delivery cost rule (free from a set amount).
 - New order → row in sheet «Замовлення» + instant notification to the owner.
-- Owner changes the status in the sheet (Нове → Підтверджено → Доставляється → Виконано); the customer sees current statuses via the «📦 Мої замовлення» button.
+- **Auto status notifications**: the owner changes the status in the sheet (Підтверджено → Доставляється → Виконано / Скасовано) and the customer gets a Telegram message within a minute.
+- «📦 Мої замовлення» button: the customer sees recent orders and statuses.
 - Google side is a tiny Apps Script web app protected by a secret key; no Google service accounts.
 
 ## Stack

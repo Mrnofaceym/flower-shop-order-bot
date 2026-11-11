@@ -47,6 +47,12 @@ async def add_order(order: dict) -> int:
     return int(data["number"])
 
 
+async def statuses():
+    """[{number, user, status}] for recent orders — used by the status notifier."""
+    data = await _request("GET", {"action": "statuses"})
+    return data["orders"]
+
+
 async def user_orders(user_id: int):
     data = await _request("GET", {"action": "orders", "user": str(user_id)})
     return data["orders"]

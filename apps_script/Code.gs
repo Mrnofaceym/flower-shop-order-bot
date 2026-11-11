@@ -86,6 +86,7 @@ function doGet(e) {
   if (!authorized(p.secret)) return json({ok: false, error: 'forbidden'});
   if (p.action === 'catalog') return json({ok: true, items: readCatalog()});
   if (p.action === 'orders') return json({ok: true, orders: readOrders(String(p.user || ''))});
+  if (p.action === 'statuses') return json({ok: true, orders: readStatuses()});
   return json({ok: false, error: 'unknown action'});
 }
 
@@ -116,6 +117,14 @@ function readCatalog() {
   return rows.slice(1)
     .filter(r => r[1] !== '' && r[4] === true)
     .map(r => ({id: String(r[0]), name: String(r[1]), description: String(r[2]), price: Number(r[3])}));
+}
+
+/** Number, customer id and status of the last 300 orders: the bot compares them to notify customers. */
+function readStatuses() {
+  const rows = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(ORDERS).getDataRange().getValues();
+  return rows.slice(1).slice(-300)
+    .filter(r => r[0] !== '' && String(r[4]) !== '')
+    .map(r => ({number: r[0], user: String(r[4]), status: String(r[11])}));
 }
 
 function readOrders(user) {

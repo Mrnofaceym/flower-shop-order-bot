@@ -25,3 +25,4 @@ DELIVERY_PRICE = 150
 FREE_DELIVERY_FROM = 2000
 DAYS_AHEAD = 7            # how many days ahead a client can choose
 CATALOG_CACHE_SECONDS = 60
+STATUS_CHECK_SECONDS = 60  # how often the bot checks the sheet for status changes
