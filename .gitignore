@@ -5,3 +5,5 @@ venv/
 __pycache__/
 *.pyc
 statuses.json
+docs/phone.png
+docs/cover.html

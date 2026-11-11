@@ -2,6 +2,8 @@
 
 Telegram bot for a small shop (demo: flower shop «Півонія»). Customers order in Telegram, orders land in a **Google Sheet**, the owner changes the status in the sheet — and the customer gets a message within a minute.
 
+![cover](docs/cover.png)
+
 Telegram-бот для невеликого магазину: замовлення в Telegram → Google Таблиця → власник змінює статус у таблиці → клієнт за хвилину отримує повідомлення.
 
 ## Features
